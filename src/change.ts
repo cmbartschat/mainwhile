@@ -1,4 +1,7 @@
 import {DefaultLogFields} from 'simple-git'
 
-type ChangeMetadata = DefaultLogFields
+type ChangeMetadata = DefaultLogFields & {
+  remaining: number
+}
+
 export {ChangeMetadata}

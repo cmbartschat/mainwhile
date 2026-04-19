@@ -6,9 +6,14 @@ const useNextChange = () => {
   const ctx = useCtx()
   return useSuspenseQuery({
     queryKey: ['state', 'next-change'],
-    queryFn: async (): Promise<ChangeMetadata | undefined> => {
+    queryFn: async (): Promise<ChangeMetadata | null> => {
       const logs = await ctx.git.log({from: ctx.tag, to: ctx.main})
-      return logs.all.at(-2)
+      const remaining = logs.all.length
+      const next = logs.all.at(-1)
+      if (!next) {
+        return null
+      }
+      return {...next, remaining}
     },
   }).data
 }

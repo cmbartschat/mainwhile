@@ -4,6 +4,7 @@
     "types": ["node"],
     "outDir": "dist",
     "jsx": "react",
+    "noEmitOnError": false,
     "rootDir": "src"
   },
   "include": ["src"]
