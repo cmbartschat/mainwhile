@@ -1,6 +1,7 @@
 {
   "extends": "@sindresorhus/tsconfig",
   "compilerOptions": {
+    "types": ["node"],
     "outDir": "dist",
     "jsx": "react",
     "rootDir": "src"

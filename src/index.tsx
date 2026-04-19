@@ -1,28 +1,15 @@
 import React from 'react'
 import {render} from 'ink'
-import meow from 'meow'
 import {App} from './app.js'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {CtxProvider} from './ctx.js'
 
-const cli = meow(
-  `
-	Usage
-	  $ hindsight
+const client = new QueryClient()
 
-	Options
-		--name  Your name
-
-	Examples
-	  $ hindsight --name=Jane
-	  Hello, Jane
-`,
-  {
-    importMeta: import.meta,
-    flags: {
-      name: {
-        type: 'string',
-      },
-    },
-  },
+render(
+  <QueryClientProvider client={client}>
+    <CtxProvider>
+      <App />
+    </CtxProvider>
+  </QueryClientProvider>,
 )
-
-render(<App name={cli.flags.name} />)
