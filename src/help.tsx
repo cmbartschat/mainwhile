@@ -1,7 +1,9 @@
 import {Box, Text} from 'ink'
 import React from 'react'
+import {useCtx} from './ctx.js'
 
 const Help: React.FC = () => {
+  const ctx = useCtx()
   return (
     <Box
       flexDirection='column'
@@ -14,11 +16,11 @@ const Help: React.FC = () => {
       <Box height={1} />
       <Text>H - Toggle this menu</Text>
       <Text>⏎ - Accept current change</Text>
-      {/* <Text>P - Open change in browser</Text> */}
+      {ctx.remote && <Text>P - Open change in browser</Text>}
       {/* <Text>R - Raise issue</Text> */}
       {/* <Text>S - Show settings</Text> */}
-      <Text>C - Check out the repo to this change</Text>
-      <Text>Q - quit</Text>
+      <Text>C - Check out this change locally</Text>
+      <Text>Q - Quit</Text>
     </Box>
   )
 }

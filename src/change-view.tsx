@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useSuspenseQuery} from '@tanstack/react-query'
+import {useQuery, useSuspenseQuery} from '@tanstack/react-query'
 import {ChangeMetadata} from './change.js'
 import {useCtx} from './ctx.js'
 import {Box, Text, useApp, useInput} from 'ink'
@@ -8,6 +8,7 @@ import {accept} from './action/accept.js'
 import {ScrollView} from './scroll-view.js'
 import {preview} from './action/preview.js'
 import {Help} from './help.js'
+import {openCommit} from './action/open-commit.js'
 
 interface IChangeView {
   change: ChangeMetadata
@@ -38,11 +39,6 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
     },
   })
 
-  const accepting = useMutation({
-    mutationKey: ['accept', change.hash],
-    mutationFn: async () => accept(ctx, change.hash),
-  })
-
   useInput(async (e, key) => {
     if (e === 'h') {
       setHelpShown(e => !e)
@@ -68,6 +64,17 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
       return
     }
 
+    if (e === 'p') {
+      try {
+        setStatus('Opening in browser...')
+        await openCommit(ctx, change.hash)
+        setStatus('')
+      } catch (err) {
+        setStatus(String(err))
+      }
+      return
+    }
+
     if (key.leftArrow) {
       setViewIndex(s => Math.max(0, s - 1))
       return
@@ -78,9 +85,14 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
     }
 
     if (key.return) {
-      setViewIndex(0)
-      setStatus('')
-      return accepting.mutate()
+      setStatus('Accepting..')
+      try {
+        accept(ctx, change.hash)
+        setViewIndex(0)
+        setStatus('')
+      } catch (err) {
+        setStatus(String(err))
+      }
     }
   })
 
@@ -109,20 +121,14 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
       <Text>│</Text>
       <Box>
         <Text>└──────────────────────── </Text>
-        {accepting.isPending ? (
-          <Text>Accepting...</Text>
-        ) : (
-          <Box>
-            {VIEWS.map((e, i) => (
-              <React.Fragment key={e}>
-                {i > 0 ? <Text> ─ </Text> : null}
-                <Text backgroundColor={view === e ? 'blue' : undefined}>
-                  {e}
-                </Text>
-              </React.Fragment>
-            ))}
-          </Box>
-        )}
+        <Box>
+          {VIEWS.map((e, i) => (
+            <React.Fragment key={e}>
+              {i > 0 ? <Text> ─ </Text> : null}
+              <Text backgroundColor={view === e ? 'blue' : undefined}>{e}</Text>
+            </React.Fragment>
+          ))}
+        </Box>
       </Box>
       <Box height={1} />
       <Box
