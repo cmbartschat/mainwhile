@@ -6,6 +6,8 @@ import React from 'react'
 import {Diff} from './diff.js'
 import {accept} from './action/accept.js'
 import {ScrollView} from './scroll-view.js'
+import {preview} from './action/preview.js'
+import {Help} from './help.js'
 
 interface IChangeView {
   change: ChangeMetadata
@@ -17,6 +19,8 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
   const ctx = useCtx()
   const [viewIndex, setViewIndex] = React.useState(0)
   const view = VIEWS[viewIndex] || VIEWS[0]
+  const [helpShown, setHelpShown] = React.useState(false)
+  const [status, setStatus] = React.useState('')
   const app = useApp()
 
   const summary = useSuspenseQuery({
@@ -40,6 +44,30 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
   })
 
   useInput(async (e, key) => {
+    if (e === 'h') {
+      setHelpShown(e => !e)
+      return
+    }
+
+    if (e == 'q') {
+      app.exit()
+      return
+    }
+
+    if (helpShown) {
+      return
+    }
+
+    if (e === 'c') {
+      try {
+        await preview(ctx, change.hash)
+        setStatus('Checked out change.')
+      } catch (err) {
+        setStatus(String(err))
+      }
+      return
+    }
+
     if (key.leftArrow) {
       setViewIndex(s => Math.max(0, s - 1))
       return
@@ -49,13 +77,9 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
       return
     }
 
-    if (e == 'q') {
-      app.exit()
-      return
-    }
-
     if (key.return) {
       setViewIndex(0)
+      setStatus('')
       return accepting.mutate()
     }
   })
@@ -68,6 +92,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
             ? 'last change to review'
             : change.remaining + ' changes remaining'}
         </Text>
+        <Text color='gray'>(h)elp</Text>
       </Box>
       <Text>│</Text>
       <Text>
@@ -90,18 +115,23 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
           <Box>
             {VIEWS.map((e, i) => (
               <React.Fragment key={e}>
-                {i > 0 ? <Text> │ </Text> : null}
+                {i > 0 ? <Text> ─ </Text> : null}
                 <Text backgroundColor={view === e ? 'blue' : undefined}>
                   {e}
                 </Text>
               </React.Fragment>
             ))}
-            <Text> &larr; &rarr;</Text>
           </Box>
         )}
       </Box>
       <Box height={1} />
-      <Box flexGrow={1} flexBasis={0} flexDirection='column' width={'100%'}>
+      <Box
+        flexGrow={1}
+        flexShrink={1}
+        flexBasis={0}
+        flexDirection='column'
+        width={'100%'}
+      >
         <ScrollView>
           {view === 'files' && (
             <Box flexDirection='column'>
@@ -133,13 +163,29 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
             </Box>
           )}
           {view === 'diff' && diff.data && <Diff content={diff.data} />}
-          {/* <Text>Start</Text>
-          {Array.from({length: 20}, (e, i) => (
-            <Text key={i}>{' '.repeat(i * 2) + '└─┐'}</Text>
-          ))}
-          <Text>{' '.repeat(40) + 'End'}</Text> */}
         </ScrollView>
       </Box>
+      {status && (
+        <Box
+          borderStyle={'single'}
+          paddingBottom={1}
+          paddingX={1}
+          borderBottom={false}
+        >
+          <Text>{status}</Text>
+        </Box>
+      )}
+      {helpShown && (
+        <Box
+          position='absolute'
+          height='100%'
+          width='100%'
+          justifyContent='center'
+          alignItems='center'
+        >
+          <Help />
+        </Box>
+      )}
     </Box>
   )
 }
