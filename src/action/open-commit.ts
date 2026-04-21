@@ -27,7 +27,7 @@ const resolveCommitUrl = async (ctx: Ctx, commit: string): Promise<string> => {
     }
 
     return matchedUrl
-  } catch (err) {
+  } catch {
     return ctx.remote.urlBase + '/commit/' + commit
   }
 }
