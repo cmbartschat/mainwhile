@@ -9,6 +9,8 @@ import {ScrollView} from './scroll-view.js'
 import {preview} from './action/preview.js'
 import {Help} from './help.js'
 import {openCommit} from './action/open-commit.js'
+import {RaiseModal} from './raise-modal.js'
+import {raise} from './action/raise.js'
 
 interface IChangeView {
   change: ChangeMetadata
@@ -18,9 +20,11 @@ const VIEWS = ['files', 'diff'] as const
 
 const ChangeView: React.FC<IChangeView> = ({change}) => {
   const ctx = useCtx()
+  const [mode, setMode] = React.useState<'default' | 'help' | 'raise'>(
+    'default',
+  )
   const [viewIndex, setViewIndex] = React.useState(0)
   const view = VIEWS[viewIndex] || VIEWS[0]
-  const [helpShown, setHelpShown] = React.useState(false)
   const [status, setStatus] = React.useState('')
   const app = useApp()
 
@@ -40,8 +44,14 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
   })
 
   useInput(async (e, key) => {
+    if (mode === 'raise') {
+      if (key.escape) {
+        setMode('default')
+      }
+      return
+    }
     if (e === 'h') {
-      setHelpShown(e => !e)
+      setMode(m => (m === 'help' ? 'default' : 'help'))
       return
     }
 
@@ -50,7 +60,12 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
       return
     }
 
-    if (helpShown) {
+    if (mode === 'help') {
+      return
+    }
+
+    if (e === 'r') {
+      setMode('raise')
       return
     }
 
@@ -181,7 +196,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
           <Text>{status}</Text>
         </Box>
       )}
-      {helpShown && (
+      {mode === 'help' && (
         <Box
           position='absolute'
           height='100%'
@@ -191,6 +206,18 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
         >
           <Help />
         </Box>
+      )}
+      {mode === 'raise' && (
+        <RaiseModal
+          onSubmit={async title => {
+            try {
+              await raise(ctx, change.hash, title)
+              setMode('default')
+            } catch (err) {
+              setStatus(String(err))
+            }
+          }}
+        />
       )}
     </Box>
   )

@@ -1,10 +1,11 @@
 import open from 'open'
 import {Ctx} from '../ctx.js'
 
-const openCommit = async (ctx: Ctx, commit: string) => {
+const resolveCommitUrl = async (ctx: Ctx, commit: string): Promise<string> => {
   if (!ctx.remote) {
     throw new Error('Cannot open commit for repo with no remote')
   }
+
   try {
     const results = await ctx.octo.rest.search.issuesAndPullRequests({
       q:
@@ -25,10 +26,14 @@ const openCommit = async (ctx: Ctx, commit: string) => {
       throw new Error('No matching PR')
     }
 
-    await open(matchedUrl)
+    return matchedUrl
   } catch (err) {
-    await open(ctx.remote.urlBase + '/commit/' + commit)
+    return ctx.remote.urlBase + '/commit/' + commit
   }
 }
 
-export {openCommit}
+const openCommit = async (ctx: Ctx, commit: string) => {
+  await open(await resolveCommitUrl(ctx, commit))
+}
+
+export {openCommit, resolveCommitUrl}

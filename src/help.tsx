@@ -17,7 +17,7 @@ const Help: React.FC = () => {
       <Text>H - Toggle this menu</Text>
       <Text>⏎ - Accept current change</Text>
       {ctx.remote && <Text>P - Open change in browser</Text>}
-      {/* <Text>R - Raise issue</Text> */}
+      {ctx.remote && <Text>R - Raise issue</Text>}
       {/* <Text>S - Show settings</Text> */}
       <Text>C - Check out this change locally</Text>
       <Text>Q - Quit</Text>
