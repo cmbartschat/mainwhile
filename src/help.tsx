@@ -18,7 +18,7 @@ const Help: React.FC = () => {
       <Text>⏎ - Accept current change</Text>
       {ctx.remote && <Text>P - Open change in browser</Text>}
       {ctx.remote && <Text>R - Raise issue</Text>}
-      {/* <Text>S - Show settings</Text> */}
+      <Text>F - Show filtering rules</Text>
       <Text>C - Check out this change locally</Text>
       <Text>Q - Quit</Text>
     </Box>

@@ -2,7 +2,7 @@ import {Box, useInput, DOMElement} from 'ink'
 import React from 'react'
 
 interface IScrollView {
-  children: React.ReactNode[]
+  children: React.ReactNode
 }
 
 const ScrollView: React.FC<IScrollView> = ({children}) => {

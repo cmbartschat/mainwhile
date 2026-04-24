@@ -11,6 +11,7 @@ import {Help} from './help.js'
 import {openCommit} from './action/open-commit.js'
 import {RaiseModal} from './raise-modal.js'
 import {raise} from './action/raise.js'
+import {FilterModal} from './filter-modal.js'
 
 interface IChangeView {
   change: ChangeMetadata
@@ -20,9 +21,9 @@ const VIEWS = ['files', 'diff'] as const
 
 const ChangeView: React.FC<IChangeView> = ({change}) => {
   const ctx = useCtx()
-  const [mode, setMode] = React.useState<'default' | 'help' | 'raise'>(
-    'default',
-  )
+  const [mode, setMode] = React.useState<
+    'default' | 'help' | 'raise' | 'filters'
+  >('default')
   const [viewIndex, setViewIndex] = React.useState(0)
   const view = VIEWS[viewIndex] || VIEWS[0]
   const [status, setStatus] = React.useState('')
@@ -44,7 +45,12 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
   })
 
   useInput(async (e, key) => {
-    if (mode === 'raise') {
+    if (mode === 'filters' && e === 'f') {
+      setMode('default')
+      return
+    }
+
+    if (mode === 'raise' || mode === 'filters') {
       if (key.escape) {
         setMode('default')
       }
@@ -66,6 +72,11 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
 
     if (e === 'r') {
       setMode('raise')
+      return
+    }
+
+    if (e === 'f') {
+      setMode('filters')
       return
     }
 
@@ -219,6 +230,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
           }}
         />
       )}
+      {mode === 'filters' && <FilterModal />}
     </Box>
   )
 }

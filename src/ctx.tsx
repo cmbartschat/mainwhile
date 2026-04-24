@@ -3,6 +3,7 @@ import React from 'react'
 import {Octokit} from 'octokit'
 import {simpleGit, SimpleGit} from 'simple-git'
 import {extractRemote, Remote} from './remote.js'
+import path from 'path'
 
 type Ctx = {
   pwd: string
@@ -10,6 +11,7 @@ type Ctx = {
   main: 'main'
   refresh: () => void
   octo: Octokit
+  configPath: string
   git: SimpleGit
   remote: Remote | null
 }
@@ -33,6 +35,7 @@ const useLoadCtx = () => {
         main: 'main',
         octo: new Octokit({}),
         git,
+        configPath: path.join(process.cwd(), '.git', 'hindsight-config'),
         remote: await extractRemote(git),
         refresh: () =>
           queryClient.resetQueries({
