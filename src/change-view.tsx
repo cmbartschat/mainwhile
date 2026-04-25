@@ -171,16 +171,18 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
                 return (
                   <Box key={file.file}>
                     {file.binary ? (
-                      <Text>(binary)</Text>
+                      <Box minWidth={11} justifyContent='center'>
+                        <Text color='yellow'>(binary)</Text>
+                      </Box>
                     ) : (
                       <>
-                        <Box minWidth={5}>
+                        <Box minWidth={5} justifyContent='flex-end'>
                           <Text color='green'>
                             {file.insertions ? '+' + file.insertions : null}
                           </Text>
                         </Box>
                         <Text> </Text>
-                        <Box minWidth={5}>
+                        <Box minWidth={5} justifyContent='flex-end'>
                           <Text color='red'>
                             {file.deletions ? '-' + file.deletions : null}
                           </Text>
