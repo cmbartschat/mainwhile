@@ -29,13 +29,14 @@ const useLoadCtx = () => {
     queryKey: ['state', 'ctx'],
     queryFn: async (): Promise<Ctx> => {
       const git = simpleGit(process.cwd())
+      const pwd = (await git.raw(['rev-parse', '--show-toplevel'])).trim()
       return {
-        pwd: process.cwd(),
+        pwd: pwd,
         tag: 'hindsight',
         main: 'main',
         octo: new Octokit({}),
         git,
-        configPath: path.join(process.cwd(), '.git', 'hindsight-config'),
+        configPath: path.join(pwd, '.git', 'hindsight-config'),
         remote: await extractRemote(git),
         refresh: () => queryClient.refetchQueries(),
       }
