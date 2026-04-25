@@ -9,7 +9,7 @@ type Ctx = {
   pwd: string
   tag: 'hindsight'
   main: 'main'
-  refresh: () => void
+  refresh: () => Promise<void>
   octo: Octokit
   configPath: string
   git: SimpleGit
@@ -37,10 +37,7 @@ const useLoadCtx = () => {
         git,
         configPath: path.join(process.cwd(), '.git', 'hindsight-config'),
         remote: await extractRemote(git),
-        refresh: () =>
-          queryClient.resetQueries({
-            queryKey: [],
-          }),
+        refresh: () => queryClient.refetchQueries(),
       }
     },
   }).data

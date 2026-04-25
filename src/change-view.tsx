@@ -113,7 +113,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
     if (key.return) {
       setStatus('Accepting..')
       try {
-        accept(ctx, change.hash)
+        await accept(ctx, change.hash)
         setViewIndex(0)
         setStatus('')
       } catch (err) {
