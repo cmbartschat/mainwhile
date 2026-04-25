@@ -1,5 +1,3 @@
-import {useSuspenseQuery} from '@tanstack/react-query'
-import {useCtx} from './ctx.js'
 import fs from 'fs/promises'
 import {ChangeMetadata} from './change.js'
 import {DefaultLogFields} from 'simple-git'
@@ -64,23 +62,25 @@ const stringifyFilters = (filters: Filter[]): string => {
   return filters.map(stringifyFilter).join('\n')
 }
 
-const useFilters = () => {
-  const ctx = useCtx()
-  return useSuspenseQuery({
-    queryKey: ['filters'],
-    queryFn: async (): Promise<Filter[]> => {
-      let content: string
-      try {
-        content = await fs.readFile(ctx.configPath, 'utf8')
-      } catch (err) {
-        if ((err as {code: string}).code === 'ENOENT') {
-          return []
-        }
-        throw err
-      }
-      return parseFilters(content)
-    },
-  }).data
+const loadFilters = async (configPath: string): Promise<Filter[]> => {
+  try {
+    const content = await fs.readFile(configPath, 'utf8')
+    return parseFilters(content)
+  } catch (err) {
+    if ((err as {code: string}).code === 'ENOENT') {
+      return []
+    }
+    throw err
+  }
 }
 
-export {useFilters, filterMatches, stringifyFilters}
+const isSkipped = (
+  commit: DefaultLogFields | ChangeMetadata,
+  filters: Filter[],
+): boolean => {
+  return filters.some(e => filterMatches(e, commit))
+}
+
+export {loadFilters, filterMatches, stringifyFilters, isSkipped}
+
+export type {Filter}

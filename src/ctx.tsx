@@ -4,6 +4,7 @@ import {Octokit} from 'octokit'
 import {simpleGit, SimpleGit} from 'simple-git'
 import {extractRemote, Remote} from './remote.js'
 import path from 'path'
+import {Filter, loadFilters} from './filters.js'
 
 type Ctx = {
   pwd: string
@@ -14,6 +15,8 @@ type Ctx = {
   configPath: string
   git: SimpleGit
   remote: Remote | null
+  filters: Filter[]
+  user: string
 }
 
 const CtxContext = React.createContext<Ctx | null>(null)
@@ -30,14 +33,21 @@ const useLoadCtx = () => {
     queryFn: async (): Promise<Ctx> => {
       const git = simpleGit(process.cwd())
       const pwd = (await git.raw(['rev-parse', '--show-toplevel'])).trim()
+      const configPath = path.join(pwd, '.git', 'hindsight-config')
+      const [remote, filters] = await Promise.all([
+        extractRemote(git),
+        loadFilters(configPath),
+      ])
       return {
         pwd: pwd,
         tag: 'hindsight',
         main: 'main',
         octo: new Octokit({}),
         git,
-        configPath: path.join(pwd, '.git', 'hindsight-config'),
-        remote: await extractRemote(git),
+        configPath,
+        filters,
+        remote,
+        user: process.env['USER'] || 'unset-user',
         refresh: () => queryClient.refetchQueries(),
       }
     },

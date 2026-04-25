@@ -1,13 +1,12 @@
 import {Box, Text, useInput} from 'ink'
 import React from 'react'
-import {stringifyFilters, useFilters} from './filters.js'
+import {stringifyFilters} from './filters.js'
 import {ScrollView} from './scroll-view.js'
 import {useCtx} from './ctx.js'
 import {editFilters} from './action/edit-filters.js'
 
 const FilterModal: React.FC = () => {
   const ctx = useCtx()
-  const filters = useFilters()
   useInput((_, key) => {
     if (key.return) {
       editFilters(ctx)
@@ -46,7 +45,7 @@ const FilterModal: React.FC = () => {
         <Box height={1} />
         <Text>Your Filters:</Text>
         <ScrollView>
-          <Text color='blueBright'>{stringifyFilters(filters)}</Text>
+          <Text color='blueBright'>{stringifyFilters(ctx.filters)}</Text>
         </ScrollView>
       </Box>
     </Box>
