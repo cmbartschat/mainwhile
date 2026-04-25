@@ -9,7 +9,7 @@ import {Filter, loadFilters} from './filters.js'
 type Ctx = {
   pwd: string
   tag: 'hindsight'
-  main: 'main'
+  main: 'main' | 'origin/main'
   refresh: () => Promise<void>
   octo: Octokit
   configPath: string
@@ -28,30 +28,47 @@ const CtxProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
 
 const useLoadCtx = () => {
   const queryClient = useQueryClient()
-  return useSuspenseQuery({
-    queryKey: ['state', 'ctx'],
-    queryFn: async (): Promise<Ctx> => {
+  const firstTimeLoad = useSuspenseQuery({
+    queryKey: ['first-time'],
+    queryFn: async (): Promise<Omit<Ctx, 'filters'>> => {
       const git = simpleGit(process.cwd())
       const pwd = (await git.raw(['rev-parse', '--show-toplevel'])).trim()
       const configPath = path.join(pwd, '.git', 'hindsight-config')
-      const [remote, filters] = await Promise.all([
-        extractRemote(git),
-        loadFilters(configPath),
-      ])
+      const remote = await extractRemote(git)
+      let main: Ctx['main'] = 'main'
+      if (remote) {
+        await git.fetch('origin', 'main')
+        main = 'origin/main'
+      }
       return {
         pwd: pwd,
         tag: 'hindsight',
-        main: 'main',
+        main,
         octo: new Octokit({}),
         git,
         configPath,
-        filters,
         remote,
         user: process.env['USER'] || 'unset-user',
-        refresh: () => queryClient.refetchQueries(),
+        refresh: () => {
+          return queryClient.refetchQueries({
+            queryKey: ['mutable'],
+          })
+        },
       }
     },
-  }).data
+  })
+
+  const filters = useSuspenseQuery({
+    queryKey: ['mutable', 'filters', firstTimeLoad.data.configPath],
+    queryFn: () => {
+      return loadFilters(firstTimeLoad.data.configPath)
+    },
+  })
+
+  return React.useMemo(
+    () => ({...firstTimeLoad.data, filters: filters.data}),
+    [firstTimeLoad.data, filters.data],
+  )
 }
 
 const useCtx = () => {

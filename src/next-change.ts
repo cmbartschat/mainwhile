@@ -11,22 +11,15 @@ type NextChange =
 const useNextChange = () => {
   const ctx = useCtx()
   return useSuspenseQuery({
-    queryKey: ['state', 'next-change', ctx.filters],
+    queryKey: ['mutable', 'next-change', ctx.filters],
     queryFn: async (): Promise<NextChange> => {
-      let target: string = ctx.main
-      try {
-        await ctx.git.fetch('origin', ctx.main)
-        target = 'origin/' + ctx.main
-      } catch {
-        // Ignore
-      }
       let from: string
       try {
         from = await ctx.git.revparse('refs/tags/' + ctx.tag)
       } catch {
         return {type: 'no-tag'}
       }
-      const logs = await ctx.git.log({from, to: target})
+      const logs = await ctx.git.log({from, to: ctx.main})
       const visibleRemaining = logs.all.filter(e => !isSkipped(e, ctx.filters))
       const next = visibleRemaining.at(-1)
       if (!next) {
