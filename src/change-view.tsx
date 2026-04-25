@@ -45,19 +45,30 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
   })
 
   useInput(async (e, key) => {
-    if (mode === 'filters' && e === 'f') {
+    if (key.escape) {
       setMode('default')
+    }
+
+    if (mode === 'raise') {
       return
     }
 
-    if (mode === 'raise' || mode === 'filters') {
-      if (key.escape) {
-        setMode('default')
-      }
-      return
+    let toggledMode: 'help' | 'raise' | 'filters' | undefined
+    switch (e) {
+      case 'f':
+        toggledMode = 'filters'
+        break
+      case 'r':
+        toggledMode = 'raise'
+        break
+      case 'h':
+        toggledMode = 'help'
+        break
+      default:
     }
-    if (e === 'h') {
-      setMode(m => (m === 'help' ? 'default' : 'help'))
+
+    if (toggledMode) {
+      setMode(s => (s === toggledMode ? 'default' : toggledMode))
       return
     }
 
@@ -66,17 +77,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
       return
     }
 
-    if (mode === 'help') {
-      return
-    }
-
-    if (e === 'r') {
-      setMode('raise')
-      return
-    }
-
-    if (e === 'f') {
-      setMode('filters')
+    if (mode !== 'default') {
       return
     }
 
