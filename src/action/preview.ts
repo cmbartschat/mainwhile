@@ -7,9 +7,9 @@ const preview = async (ctx: Ctx, commit: string) => {
   if (!status.isClean() && !status.detached) {
     throw new Error('Git state is not clean, cannot preview')
   }
+  await git.checkout([commit])
   await git.reset([commit, '--hard'])
   await git.reset(ResetMode.SOFT, [commit + '^1'])
-  ctx.refresh()
 }
 
 export {preview}
