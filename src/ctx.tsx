@@ -6,9 +6,12 @@ import {extractRemote, Remote} from './remote.js'
 import path from 'path'
 import {Filter, loadFilters} from './filters.js'
 
+const PRODUCT_NAME = 'mainwhile'
+
 type Ctx = {
   pwd: string
-  tag: 'hindsight'
+  tag: string
+  remoteTag: string | undefined
   main: 'main' | 'origin/main'
   refresh: () => Promise<void>
   octo: Octokit
@@ -16,7 +19,6 @@ type Ctx = {
   git: SimpleGit
   remote: Remote | null
   filters: Filter[]
-  user: string
 }
 
 const CtxContext = React.createContext<Ctx | null>(null)
@@ -33,22 +35,29 @@ const useLoadCtx = () => {
     queryFn: async (): Promise<Omit<Ctx, 'filters'>> => {
       const git = simpleGit(process.cwd())
       const pwd = (await git.raw(['rev-parse', '--show-toplevel'])).trim()
-      const configPath = path.join(pwd, '.git', 'hindsight-config')
+      const configPath = path.join(pwd, '.git', PRODUCT_NAME + '-config')
       const remote = await extractRemote(git)
+      const user = process.env['USER']
       let main: Ctx['main'] = 'main'
-      if (remote) {
+      let remoteTag: string | undefined
+      if (remote && user) {
         await git.fetch('origin', 'main')
         main = 'origin/main'
+        remoteTag = user + '-' + PRODUCT_NAME
+      }
+
+      if (!user) {
+        throw new Error('Unable to resolve username')
       }
       return {
         pwd: pwd,
-        tag: 'hindsight',
+        tag: PRODUCT_NAME,
+        remoteTag,
         main,
         octo: new Octokit({}),
         git,
         configPath,
         remote,
-        user: process.env['USER'] || 'unset-user',
         refresh: () => {
           return queryClient.refetchQueries({
             queryKey: ['mutable'],

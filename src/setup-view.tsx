@@ -78,9 +78,9 @@ const SetupView: React.FC = () => {
 
   return (
     <Box flexDirection='column' height='100%' width={'100%'}>
-      <Text color='blueBright'>no hindsight tag yet</Text>
+      <Text color='blueBright'>No checkpoint found</Text>
       <Text>│</Text>
-      <Text>│{'   '}Choose start location</Text>
+      <Text>│{'   '}Choose starting point</Text>
       <Text>
         │{'   '}
         <Text color='gray'>How far back do you want to look?</Text>

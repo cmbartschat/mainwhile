@@ -20,10 +20,7 @@ const accept = async (ctx: Ctx, commit: string) => {
   const target = logs.all[nextStopIndex + 1]?.hash || commit
   await ctx.git.tag([ctx.tag, target, '-f'])
   if (ctx.remote) {
-    ctx.git.push([
-      'origin',
-      '+' + target + ':refs/tags/' + ctx.user + '-hindsight',
-    ])
+    ctx.git.push(['origin', '+' + target + ':refs/tags/' + ctx.remoteTag])
   }
   await ctx.refresh()
 }
