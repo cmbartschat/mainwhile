@@ -28,22 +28,17 @@ const FilterModal: React.FC = () => {
         width={65}
         backgroundColor={'black'}
       >
-        <Text>
-          Filters <Text color='gray'>⏎ to open</Text>
-        </Text>
+        <Text>Filters</Text>
         <Box height={1} />
         <Text>Examples:</Text>
         <Text color='gray'># Don&apos;t need to review your own changes</Text>
         <Text color='blueBright'>email: youremail@example.com</Text>
         <Text color='gray'># Or by name</Text>
-        <Text color='blueBright'>name: Your Name</Text>
-        <Text color='gray'>
-          # Maybe you&apos;re not interested in certain paths:
-        </Text>
-        <Text color='blueBright'>path: path/to/file.txt</Text>
-        <Text color='blueBright'>path: path/to/folder/</Text>
+        <Text color='blueBright'>name: Some Name</Text>
         <Box height={1} />
-        <Text>Your Filters:</Text>
+        <Text>
+          Your Filters: <Text color='gray'>⏎ to open</Text>
+        </Text>
         <ScrollView>
           <Text color='blueBright'>{stringifyFilters(ctx.filters)}</Text>
         </ScrollView>

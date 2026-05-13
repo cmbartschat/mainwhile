@@ -3,7 +3,7 @@ import {ChangeMetadata} from './change.js'
 import {DefaultLogFields} from 'simple-git'
 
 type Filter = {
-  type: 'name' | 'email' | 'path'
+  type: 'name' | 'email'
   pattern: string
 }
 
@@ -15,10 +15,7 @@ const parseFilter = (line: string): Filter => {
   if (nonComment.startsWith('email:')) {
     return {type: 'email', pattern: nonComment.slice('email:'.length).trim()}
   }
-  if (nonComment.startsWith('path:')) {
-    return {type: 'path', pattern: nonComment.slice('path:'.length).trim()}
-  }
-  throw new Error('Expected name:, email:, or path: in hindsight-config file')
+  throw new Error('Expected name:, email:, or path: in config file')
 }
 
 const parseFilters = (content: string) => {
@@ -35,8 +32,6 @@ const stringifyFilter = (filter: Filter): string => {
       return 'email:' + filter.pattern
     case 'name':
       return 'name:' + filter.pattern
-    case 'path':
-      return 'path:' + filter.pattern
     default:
       throw new Error('Unexpected filter type')
   }
@@ -51,8 +46,6 @@ const filterMatches = (
       return change.author_email === filter.pattern
     case 'name':
       return change.author_name === filter.pattern
-    case 'path':
-      throw new Error('Path filters are not yet implemented')
     default:
       throw new Error('Unexpected filter type')
   }
