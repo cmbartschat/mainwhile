@@ -1,19 +1,15 @@
 import React from 'react'
-import {Box, Text} from 'ink'
 import {useNextChange} from './next-change.js'
 import {ChangeView} from './change-view.js'
 import {FullScreen} from './fullscreen.js'
 import {SetupView} from './setup-view.js'
+import {CaughtUpView} from './caught-up-view.js'
 
 const App: React.FC = () => {
   const nextChange = useNextChange()
 
   if (nextChange.type === 'done') {
-    return (
-      <Box borderStyle={'single'} paddingY={2} justifyContent='center'>
-        <Text>All caught up!</Text>
-      </Box>
-    )
+    return <CaughtUpView />
   }
 
   if (nextChange.type === 'no-tag') {
