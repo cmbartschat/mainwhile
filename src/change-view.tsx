@@ -31,6 +31,7 @@ const ChangeView: React.FC<IChangeView> = ({change}) => {
 
   const summary = useSuspenseQuery({
     queryKey: ['diff-summary', change.hash],
+    staleTime: Infinity,
     queryFn: async () => {
       return ctx.git.diffSummary([change.hash + '^1', change.hash])
     },

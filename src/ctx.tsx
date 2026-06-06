@@ -1,4 +1,8 @@
-import {useQueryClient, useSuspenseQuery} from '@tanstack/react-query'
+import {
+  QueryClient,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import React from 'react'
 import {Octokit} from 'octokit'
 import {simpleGit, SimpleGit} from 'simple-git'
@@ -12,6 +16,7 @@ type Ctx = {
   pwd: string
   tag: string
   remoteTag: string | undefined
+  queryClient: QueryClient
   main: 'main' | 'origin/main'
   refresh: () => Promise<void>
   octo: Octokit
@@ -32,7 +37,7 @@ const useLoadCtx = () => {
   const queryClient = useQueryClient()
   const firstTimeLoad = useSuspenseQuery({
     queryKey: ['first-time'],
-    queryFn: async (): Promise<Omit<Ctx, 'filters'>> => {
+    queryFn: async (): Promise<Omit<Ctx, 'filters' | 'queryClient'>> => {
       const git = simpleGit(process.cwd())
       const pwd = (await git.raw(['rev-parse', '--show-toplevel'])).trim()
       const configPath = path.join(pwd, '.git', PRODUCT_NAME + '-config')
@@ -75,8 +80,8 @@ const useLoadCtx = () => {
   })
 
   return React.useMemo(
-    () => ({...firstTimeLoad.data, filters: filters.data}),
-    [firstTimeLoad.data, filters.data],
+    () => ({...firstTimeLoad.data, filters: filters.data, queryClient}),
+    [firstTimeLoad.data, filters.data, queryClient],
   )
 }
 

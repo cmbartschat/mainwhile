@@ -1,7 +1,8 @@
 import {useSuspenseQuery} from '@tanstack/react-query'
 import {ChangeMetadata} from './change.js'
 import {useCtx} from './ctx.js'
-import {isSkipped} from './filters.js'
+import {isSkippedAsync} from './filters.js'
+import {filterAsync} from './async.js'
 
 type NextChange =
   | {type: 'no-tag'}
@@ -20,7 +21,10 @@ const useNextChange = () => {
         return {type: 'no-tag'}
       }
       const logs = await ctx.git.log({from, to: ctx.main})
-      const visibleRemaining = logs.all.filter(e => !isSkipped(e, ctx.filters))
+      const visibleRemaining = await filterAsync(
+        logs.all,
+        async e => !(await isSkippedAsync(ctx, e, ctx.filters)),
+      )
       const next = visibleRemaining.at(-1)
       if (!next) {
         return {type: 'done'}

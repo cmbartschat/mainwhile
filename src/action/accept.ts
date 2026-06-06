@@ -1,5 +1,6 @@
+import {findLastIndexAsync} from '../async.js'
 import {Ctx} from '../ctx.js'
-import {isSkipped} from '../filters.js'
+import {isSkippedAsync} from '../filters.js'
 
 const accept = async (ctx: Ctx, commit: string) => {
   const logs = await ctx.git.log({from: commit, to: ctx.main})
@@ -16,7 +17,10 @@ const accept = async (ctx: Ctx, commit: string) => {
       O <-- current location of tag
   */
 
-  const nextStopIndex = logs.all.findLastIndex(e => !isSkipped(e, ctx.filters))
+  const nextStopIndex = await findLastIndexAsync(
+    logs.all,
+    async e => !(await isSkippedAsync(ctx, e, ctx.filters)),
+  )
   const target = logs.all[nextStopIndex + 1]?.hash || commit
   await ctx.git.tag([ctx.tag, target, '-f'])
   if (ctx.remote) {

@@ -38,6 +38,9 @@ Open the filter panel with `f` and press `Enter` to open your filter config, whi
 email: youremail@example.com
 # Or by name
 name: Some Name
+# Or by path
+path: ignored-file.txt
+path: ignored-folder/
 ```
 
 Any matched changes will be excluded from your review.

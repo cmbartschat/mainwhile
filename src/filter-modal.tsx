@@ -35,6 +35,9 @@ const FilterModal: React.FC = () => {
         <Text color='blueBright'>email: youremail@example.com</Text>
         <Text color='gray'># Or by name</Text>
         <Text color='blueBright'>name: Some Name</Text>
+        <Text color='gray'># Or by path</Text>
+        <Text color='blueBright'>path: ignored-file.txt</Text>
+        <Text color='blueBright'>path: ignored-folder/</Text>
         <Box height={1} />
         <Text>
           Your Filters: <Text color='gray'>⏎ to open</Text>
