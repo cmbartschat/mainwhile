@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/cmbartschat/mainwhile/refs/heads/main/mainwhile.svg" width="64" height="64" alt="logo"></p>
+
 # mainwhile
 
 Catch up on code that's already been pushed to main.
