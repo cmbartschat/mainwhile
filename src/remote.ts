@@ -15,7 +15,7 @@ const extractRemote = async (git: SimpleGit): Promise<Remote | null> => {
   }
 
   const match =
-    /^(https:\/github\.com\/|git@github\.com:)(.*)\/(.*)\.git$/.exec(remoteUrl)
+    /^(https:\/\/github\.com\/|git@github\.com:)(.*)\/(.*)\.git$/.exec(remoteUrl)
   if (!match) {
     return null
   }
